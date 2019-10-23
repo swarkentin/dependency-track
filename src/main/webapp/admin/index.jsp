@@ -49,9 +49,10 @@
                     </div>
                     <div id="collapseScanners" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingScanners">
                         <div class="list-group">
-                            <a data-toggle="tab" class="list-group-item" href="#scannerCpeTab">Internal CPE</a>
+                            <a data-toggle="tab" class="list-group-item" href="#scannerInternalTab">Internal</a>
                             <a data-toggle="tab" class="list-group-item" href="#scannerNpmAuditTab">NPM Audit</a>
                             <a data-toggle="tab" class="list-group-item" href="#scannerOssIndexTab">Sonatype OSS Index</a>
+                            <a data-toggle="tab" class="list-group-item" href="#scannerVulnDbTab">VulnDB</a>
                         </div>
                     </div>
                 </div>
@@ -194,22 +195,24 @@
                             <button type="button" class="btn btn-default btn-config-property" data-group-name="email" data-toggle="modal" data-target="#modalEmailTestConfiguration">Test Configuration</button>
                             <button type="button" class="btn btn-primary btn-config-property" id="updateEmailConfigButton" data-group-name="email">Update</button>
                         </div>
-                        <div class="tab-pane" id="scannerCpeTab" data-admin-title="Internal CPE">
-                            <h3 class="admin-section-title">CPE Analyzer Configuration</h3>
+                        <div class="tab-pane" id="scannerInternalTab" data-admin-title="Internal Analyzer">
+                            <h3 class="admin-section-title">Internal Analyzer Configuration</h3>
                             <div class="checkbox">
-                                <input id="scannerCpeToggleButton" class="scannerToggleButton" type="checkbox" data-toggle="toggle" data-size="small" data-width="130" data-group-name="scanner" data-property-name="cpe.enabled" data-on="<i class='fa fa-power-off'></i> Enabled" data-off="<i class='fa fa-power-off'></i> Disabled">
+                                <input id="scannerCpeToggleButton" class="scannerToggleButton" type="checkbox" data-toggle="toggle" data-size="small" data-width="130" data-group-name="scanner" data-property-name="internal.enabled" data-on="<i class='fa fa-power-off'></i> Enabled" data-off="<i class='fa fa-power-off'></i> Disabled">
                             </div>
+                            <!--
                             <p><br/></p>
                             <div class="checkbox">
-                                <label><input type="checkbox" id="scannerCpeFuzzyEnableInput" data-group-name="scanner" data-property-name="cpe.fuzzy.enabled"> Enable CPE fuzzy matching</label>
+                                <label><input type="checkbox" id="scannerCpeFuzzyEnableInput" data-group-name="scanner" data-property-name="internal.fuzzy.enabled"> Enable CPE fuzzy matching</label>
                             </div>
                             <div class="checkbox">
-                                <label><input type="checkbox" id="scannerCpeFuzzyExcludePurlInput" data-group-name="scanner" data-property-name="cpe.fuzzy.exclude.purl"> Exclude fuzzy matching on components with Package URL</label>
+                                <label><input type="checkbox" id="scannerCpeFuzzyExcludePurlInput" data-group-name="scanner" data-property-name="internal.fuzzy.exclude.purl"> Exclude fuzzy matching on components with Package URL</label>
                             </div>
+                            -->
                             <div class="panel panel-default">
                                 <div class="panel-body">
                                     <p>
-                                        The Common Platform Enumeration (CPE) analyzer is an internal scanner implementation that analyzes component CPEs against the internal vulnerability database. All vulnerabilities that have a CPE, regardless of source, will be utilized by the CPE analyzer.
+                                        The internal analyzer evaluates components against an internal vulnerability database derived from the National Vulnerability Database and VulnDB (if enabled). This analyzer makes use of the Common Platform Enumeration (CPE) defined in components. Components with a valid CPE will be evaluated with this analyzer.
                                     </p>
                                 </div>
                             </div>
@@ -266,6 +269,39 @@
                                 <div class="panel-footer">
                                     References:<br/>
                                     <a href="https://ossindex.sonatype.org/">Sonatype OSS Index</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="scannerVulnDbTab" data-admin-title="VulnDB">
+                            <h3 class="admin-section-title">VulnDB Configuration</h3>
+                            <div class="checkbox">
+                                <input id="scannerVulnDbToggleButton" class="scannerToggleButton" type="checkbox" data-toggle="toggle" data-size="small" data-width="130" data-group-name="scanner" data-property-name="vulndb.enabled" data-on="<i class='fa fa-power-off'></i> Enabled" data-off="<i class='fa fa-power-off'></i> Disabled">
+                            </div>
+                            <div class="form-group admin-form-content">
+                                <label class="required" for="scannerVulnDbApiConsumerKeyInput">Consumer Key</label>
+                                <input type="text" autocomplete="off" class="form-control required" id="scannerVulnDbApiConsumerKeyInput" data-group-name="scanner" data-property-name="vulndb.api.oauth1.consumerKey">
+                            </div>
+                            <div class="form-group admin-form-content">
+                                <label class="required" for="scannerVulnDbApiConsumerSecretInput">Consumer Secret</label>
+                                <input type="text" conceal autocomplete="off" class="form-control required" id="scannerVulnDbApiConsumerSecretInput" data-group-name="scanner" data-property-name="vulndb.api.oath1.consumerSecret">
+                            </div>
+                            <div class="form-group admin-form-content">
+                                <button type="button" class="btn btn-primary btn-config-property" id="updateVulnDbConfigButton" data-group-name="scanner">Update</button>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <p>
+                                        VulnDB is a commercial service from Risk Based Security which identifies
+                                        vulnerabilities in third-party components. Dependency-Track integrates natively
+                                        with the VulnDB service to provide highly accurate results.
+                                    </p>
+                                    <p>
+                                        Use of this analyzer requires a valid CPE for the components being analyzed.
+                                    </p>
+                                </div>
+                                <div class="panel-footer">
+                                    References:<br/>
+                                    <a href="https://vulndb.cyberriskanalytics.com/">VulnDB</a>
                                 </div>
                             </div>
                         </div>

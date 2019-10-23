@@ -31,7 +31,34 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.datanucleus.api.jdo.JDOQuery;
 import org.dependencytrack.event.IndexEvent;
-import org.dependencytrack.model.*;
+import org.dependencytrack.model.Analysis;
+import org.dependencytrack.model.AnalysisComment;
+import org.dependencytrack.model.AnalysisState;
+import org.dependencytrack.model.Bom;
+import org.dependencytrack.model.Component;
+import org.dependencytrack.model.ComponentAnalysisCache;
+import org.dependencytrack.model.ComponentMetrics;
+import org.dependencytrack.model.ConfigPropertyConstants;
+import org.dependencytrack.model.Cpe;
+import org.dependencytrack.model.Cwe;
+import org.dependencytrack.model.Dependency;
+import org.dependencytrack.model.DependencyMetrics;
+import org.dependencytrack.model.Finding;
+import org.dependencytrack.model.License;
+import org.dependencytrack.model.NotificationPublisher;
+import org.dependencytrack.model.NotificationRule;
+import org.dependencytrack.model.PortfolioMetrics;
+import org.dependencytrack.model.Project;
+import org.dependencytrack.model.ProjectMetrics;
+import org.dependencytrack.model.ProjectProperty;
+import org.dependencytrack.model.Repository;
+import org.dependencytrack.model.RepositoryMetaComponent;
+import org.dependencytrack.model.RepositoryType;
+import org.dependencytrack.model.Scan;
+import org.dependencytrack.model.Tag;
+import org.dependencytrack.model.Vulnerability;
+import org.dependencytrack.model.VulnerabilityMetrics;
+import org.dependencytrack.model.VulnerableSoftware;
 import org.dependencytrack.notification.NotificationScope;
 import org.dependencytrack.util.NotificationUtil;
 import javax.jdo.FetchPlan;
@@ -171,7 +198,7 @@ public class QueryManager extends AlpineQueryManager {
         if (excludeInactive) {
             query.setFilter("name == :name && active == true");
         } else {
-            query.setFilter("name == :name)");
+            query.setFilter("name == :name");
         }
         return execute(query, name);
     }
@@ -586,7 +613,7 @@ public class QueryManager extends AlpineQueryManager {
      */
     @SuppressWarnings("unchecked")
     private void deleteScans(Component component) {
-        final Query query = pm.newQuery(Scan.class, "components.contains(component)");
+        final Query query = pm.newQuery(Scan.class, "components.contains(:component)");
         for (final Scan scan: (List<Scan>) query.execute(component)) {
             scan.getComponents().remove(component);
             persist(scan);
@@ -634,7 +661,7 @@ public class QueryManager extends AlpineQueryManager {
      */
     @SuppressWarnings("unchecked")
     private void deleteBoms(Component component) {
-        final Query query = pm.newQuery(Bom.class, "components.contains(component)");
+        final Query query = pm.newQuery(Bom.class, "components.contains(:component)");
         for (final Bom bom: (List<Bom>) query.execute(component)) {
             bom.getComponents().remove(component);
             persist(bom);
@@ -2431,6 +2458,26 @@ public class QueryManager extends AlpineQueryManager {
             return BooleanUtil.valueOf(property.getPropertyValue());
         }
         return false;
+    }
+
+    public ComponentAnalysisCache getComponentAnalysisCache(ComponentAnalysisCache.CacheType cacheType, String targetHost, String targetType, String target) {
+        final Query query = pm.newQuery(ComponentAnalysisCache.class,
+                "cacheType == :cacheType && targetHost == :targetHost && targetType == :targetType && target == :target");
+        query.setOrdering("lastOccurrence desc");
+        return singleResult(query.executeWithArray(cacheType, targetHost, targetType, target));
+    }
+
+    public void updateComponentAnalysisCache(ComponentAnalysisCache.CacheType cacheType, String targetHost, String targetType, String target, Date lastOccurrence) {
+        ComponentAnalysisCache cac = getComponentAnalysisCache(cacheType, targetHost, targetType, target);
+        if (cac == null) {
+            cac = new ComponentAnalysisCache();
+            cac.setCacheType(cacheType);
+            cac.setTargetHost(targetHost);
+            cac.setTargetType(targetType);
+            cac.setTarget(target);
+        }
+        cac.setLastOccurrence(lastOccurrence);
+        persist(cac);
     }
 
     /**
